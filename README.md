@@ -1,0 +1,1 @@
+coletor-de-codigo-NS
