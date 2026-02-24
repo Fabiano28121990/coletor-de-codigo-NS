@@ -16,10 +16,12 @@ export function shareViaEmail(items: BarcodeItem[], listName: string): void {
 
 export function shareToGoogleDrive(items: BarcodeItem[], listName: string): void {
   const text = formatItemsForSharing(items, listName);
-  const blob = new Blob([text], { type: 'text/plain' });
-  const file = new File([blob], `${listName}.txt`, { type: 'text/plain' });
 
-  const url = 'https://drive.google.com/drive/my-drive';
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  const url = isMobile
+    ? 'https://drive.google.com/drive/mobile'
+    : 'https://drive.google.com/drive/my-drive';
+
   window.open(url, '_blank');
 
   alert('O arquivo foi preparado. Faça upload manualmente no Google Drive que foi aberto.');
