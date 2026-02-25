@@ -1,8 +1,9 @@
-import { Download, Share2, FileText, FileCode, Table, Printer, Trash2 } from 'lucide-react';
+import { Download, Share2, FileText, FileCode, Table, Printer, Trash2, Send } from 'lucide-react';
 import { useState } from 'react';
 import { exportToTXT, exportToHTML, exportToXLSX } from '../utils/export';
 import { shareViaWhatsApp, shareViaEmail, shareToGoogleDrive, shareToOneDrive } from '../utils/share';
 import { printBarcodes } from '../utils/print';
+import { SendRemessaModal } from './SendRemessaModal';
 import type { Database } from '../lib/database.types';
 
 type BarcodeItem = Database['public']['Tables']['barcode_items']['Row'];
@@ -16,6 +17,7 @@ interface ExportShareButtonsProps {
 export function ExportShareButtons({ items, listName, onDeleteAll }: ExportShareButtonsProps) {
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
+  const [showSendModal, setShowSendModal] = useState(false);
 
   const handleDeleteAll = () => {
     if (confirm(`Tem certeza que deseja apagar todos os ${items.length} códigos desta remessa?`)) {
@@ -26,8 +28,15 @@ export function ExportShareButtons({ items, listName, onDeleteAll }: ExportShare
   if (items.length === 0) return null;
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
-      <div className="flex flex-wrap gap-3">
+    <>
+      <SendRemessaModal
+        isOpen={showSendModal}
+        onClose={() => setShowSendModal(false)}
+        items={items}
+        listName={listName}
+      />
+      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+        <div className="flex flex-wrap gap-3">
         <div className="relative">
           <button
             onClick={() => {
@@ -157,6 +166,14 @@ export function ExportShareButtons({ items, listName, onDeleteAll }: ExportShare
         </div>
 
         <button
+          onClick={() => setShowSendModal(true)}
+          className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg transition flex items-center gap-2 font-medium"
+        >
+          <Send className="w-5 h-5" />
+          Enviar
+        </button>
+
+        <button
           onClick={handleDeleteAll}
           className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition flex items-center gap-2 font-medium"
         >
@@ -165,5 +182,6 @@ export function ExportShareButtons({ items, listName, onDeleteAll }: ExportShare
         </button>
       </div>
     </div>
+    </>
   );
 }
