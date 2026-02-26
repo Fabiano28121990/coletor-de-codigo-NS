@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Send, AlertCircle } from 'lucide-react';
+import { X, Send, AlertCircle, Download, Cloud } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import type { Database } from '../lib/database.types';
@@ -19,6 +19,7 @@ export function SendRemessaModal({ isOpen, onClose, items, listName }: SendRemes
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [remessaNumber, setRemessaNumber] = useState('');
+  const [sendingType, setSendingType] = useState<'cloud' | null>(null);
 
   if (!isOpen) return null;
 
@@ -36,7 +37,7 @@ export function SendRemessaModal({ isOpen, onClose, items, listName }: SendRemes
     return `${header}${email}${date}${total}${separator}${barcodes}`;
   };
 
-  const handleSend = async () => {
+  const handleSendToCloud = async () => {
     if (!remessaNumber.trim()) {
       setError('Por favor, insira o número da remessa');
       return;
@@ -45,38 +46,33 @@ export function SendRemessaModal({ isOpen, onClose, items, listName }: SendRemes
     setLoading(true);
     setError('');
     setSuccess(false);
+    setSendingType('cloud');
 
     try {
       const fileContent = generateTXTContent();
       const filename = `remessa_${remessaNumber}_${user?.email?.split('@')[0] || 'usuario'}.txt`;
 
-      const { data: credentials } = await supabase
-        .from('google_drive_credentials')
-        .select('access_token')
-        .eq('user_id', user?.id)
-        .maybeSingle();
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
 
-      if (!credentials?.access_token) {
-        setError('Você não tem credenciais do Google Drive configuradas. Por favor, faça login com Google primeiro.');
-        setLoading(false);
-        return;
+      if (!token) {
+        throw new Error('Sessão expirada. Por favor, faça login novamente.');
       }
 
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
       const response = await fetch(
-        `${supabaseUrl}/functions/v1/google-drive-upload`,
+        `${supabaseUrl}/functions/v1/save-remessa`,
         {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${supabaseAnonKey}`,
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             filename,
             content: fileContent,
-            access_token: credentials.access_token,
+            remessa_number: remessaNumber,
           }),
         }
       );
@@ -91,12 +87,29 @@ export function SendRemessaModal({ isOpen, onClose, items, listName }: SendRemes
         onClose();
         setRemessaNumber('');
         setSuccess(false);
+        setSendingType(null);
       }, 2000);
     } catch (err: any) {
       setError(err.message || 'Erro ao enviar remessa');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDownload = () => {
+    if (!remessaNumber.trim()) {
+      setError('Por favor, insira o número da remessa');
+      return;
+    }
+
+    const fileContent = generateTXTContent();
+    const element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(fileContent));
+    element.setAttribute('download', `remessa_${remessaNumber}_${user?.email?.split('@')[0] || 'usuario'}.txt`);
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
   };
 
   return (
@@ -115,9 +128,9 @@ export function SendRemessaModal({ isOpen, onClose, items, listName }: SendRemes
         <div className="p-6 space-y-4">
           {success && (
             <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 flex items-start gap-3">
-              <div className="w-5 h-5 mt-0.5 text-green-600 dark:text-green-400">✓</div>
-              <p className="text-green-700 dark:text-green-400 font-medium">
-                Remessa enviada com sucesso para o Google Drive!
+              <div className="w-5 h-5 mt-0.5 text-green-600 dark:text-green-400 font-bold">✓</div>
+              <p className="text-green-700 dark:text-green-400 font-medium text-sm">
+                {sendingType === 'cloud' ? 'Remessa salva com sucesso!' : 'Arquivo baixado com sucesso!'}
               </p>
             </div>
           )}
@@ -131,56 +144,74 @@ export function SendRemessaModal({ isOpen, onClose, items, listName }: SendRemes
 
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Número da Remessa
+              Número da Remessa *
             </label>
             <input
               type="text"
               value={remessaNumber}
-              onChange={(e) => setRemessaNumber(e.target.value)}
+              onChange={(e) => {
+                setRemessaNumber(e.target.value);
+                setError('');
+              }}
               placeholder="Ex: 2025-001"
-              disabled={loading || success}
+              disabled={loading}
               className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition disabled:opacity-50"
             />
           </div>
 
-          <div>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              <span className="font-semibold">Resumo da remessa:</span>
+          <div className="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-4 space-y-2">
+            <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+              Resumo da remessa:
             </p>
-            <ul className="mt-2 space-y-1 text-sm text-slate-600 dark:text-slate-400">
-              <li>✓ Nome: {listName}</li>
-              <li>✓ Email: {user?.email}</li>
-              <li>✓ Total de códigos: {items.length}</li>
-              <li>✓ Arquivo: remessa_{remessaNumber || 'TEMP'}_*.txt</li>
+            <ul className="space-y-1 text-sm text-slate-600 dark:text-slate-400">
+              <li>• Nome: {listName}</li>
+              <li>• Email: {user?.email}</li>
+              <li>• Total de códigos: {items.length}</li>
             </ul>
           </div>
 
-          <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
-            <p className="text-sm text-amber-700 dark:text-amber-400">
-              O arquivo será enviado diretamente para seu Google Drive associado à conta de login.
-            </p>
+          <div className="space-y-3">
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 flex gap-2">
+              <Cloud className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+              <p className="text-xs text-blue-700 dark:text-blue-400">
+                Clique em "Salvar na Nuvem" para armazenar o arquivo no servidor ou "Download" para salvar localmente.
+              </p>
+            </div>
           </div>
         </div>
 
-        <div className="flex gap-3 p-6 border-t border-slate-200 dark:border-slate-700">
+        <div className="flex flex-col gap-2 p-6 border-t border-slate-200 dark:border-slate-700">
+          <div className="flex gap-3">
+            <button
+              onClick={onClose}
+              disabled={loading}
+              className="flex-1 px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition disabled:opacity-50 font-medium text-sm"
+            >
+              Fechar
+            </button>
+            <button
+              onClick={handleDownload}
+              disabled={loading || !remessaNumber.trim()}
+              className="flex-1 bg-slate-500 hover:bg-slate-600 disabled:bg-slate-300 disabled:opacity-50 text-white px-4 py-2 rounded-lg transition font-medium flex items-center justify-center gap-2 text-sm"
+            >
+              <Download className="w-4 h-4" />
+              Download
+            </button>
+          </div>
           <button
-            onClick={onClose}
-            disabled={loading}
-            className="flex-1 px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition disabled:opacity-50 font-medium"
-          >
-            Cancelar
-          </button>
-          <button
-            onClick={handleSend}
+            onClick={handleSendToCloud}
             disabled={loading || !remessaNumber.trim()}
-            className="flex-1 bg-amber-500 hover:bg-amber-600 disabled:bg-amber-300 disabled:opacity-50 text-white px-4 py-2 rounded-lg transition font-medium flex items-center justify-center gap-2"
+            className="w-full bg-amber-500 hover:bg-amber-600 disabled:bg-amber-300 disabled:opacity-50 text-white px-4 py-3 rounded-lg transition font-medium flex items-center justify-center gap-2"
           >
             {loading ? (
-              'Enviando...'
+              <>
+                <span className="animate-spin">⏳</span>
+                Enviando...
+              </>
             ) : (
               <>
-                <Send className="w-4 h-4" />
-                Enviar
+                <Cloud className="w-5 h-5" />
+                Salvar na Nuvem
               </>
             )}
           </button>
