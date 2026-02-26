@@ -12,6 +12,14 @@ interface SaveRemessaRequest {
   remessa_number: string;
 }
 
+interface DecodedToken {
+  sub: string;
+  aud: string;
+  role: string;
+  iat: number;
+  exp: number;
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, {
@@ -32,6 +40,21 @@ Deno.serve(async (req: Request) => {
       );
     }
 
+    const token = authHeader.replace("Bearer ", "");
+    const parts = token.split(".");
+    if (parts.length !== 3) {
+      return new Response(
+        JSON.stringify({ error: "Invalid token format" }),
+        {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    const decoded = JSON.parse(atob(parts[1])) as DecodedToken;
+    const userId = decoded.sub;
+
     const { filename, content, remessa_number } = (await req.json()) as SaveRemessaRequest;
 
     if (!filename || !content || !remessa_number) {
@@ -44,23 +67,27 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const tableName = "remessa_files";
-    const timestamp = new Date().toISOString();
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+
+    if (!supabaseUrl || !serviceRoleKey) {
+      throw new Error("Missing environment variables");
+    }
 
     const insertResponse = await fetch(
-      `${Deno.env.get("SUPABASE_URL")}/rest/v1/${tableName}`,
+      `${supabaseUrl}/rest/v1/remessa_files`,
       {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+          "Authorization": `Bearer ${serviceRoleKey}`,
           "Content-Type": "application/json",
           "Prefer": "return=minimal",
         },
         body: JSON.stringify({
+          user_id: userId,
           filename,
           content,
           remessa_number,
-          created_at: timestamp,
         }),
       }
     );
@@ -81,7 +108,7 @@ Deno.serve(async (req: Request) => {
       JSON.stringify({
         success: true,
         message: "Remessa salva com sucesso",
-        timestamp,
+        timestamp: new Date().toISOString(),
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
