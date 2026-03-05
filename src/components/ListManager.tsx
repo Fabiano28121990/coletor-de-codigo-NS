@@ -31,7 +31,7 @@ export function ListManager({
   };
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+    <div className="bg-white dark:bg-[#263d42] rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="bg-green-500 p-2 rounded-lg">
@@ -42,10 +42,10 @@ export function ListManager({
 
         <button
           onClick={() => setIsCreating(true)}
-          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition flex items-center gap-2 text-sm font-medium"
+          className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-lg transition flex items-center gap-2 text-sm font-medium"
+          title="Nova Remessa"
         >
           <Plus className="w-4 h-4" />
-          Nova Remessa
         </button>
       </div>
 

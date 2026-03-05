@@ -44,7 +44,7 @@ export function ExportShareButtons({ items, listName, onDeleteAll }: ExportShare
   if (items.length === 0) return null;
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+    <div className="bg-white dark:bg-[#263d42] rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
       <div className="flex flex-wrap gap-3">
         <div className="relative">
           <button

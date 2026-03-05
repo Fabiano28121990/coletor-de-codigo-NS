@@ -74,8 +74,8 @@ export function GlobalSearch({
 
   return (
     <div className="relative">
-      <div className="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-700 rounded-lg">
-        <Search className="w-5 h-5 text-slate-500 dark:text-slate-400" />
+      <div className="flex items-center gap-2 px-3 py-2 bg-slate-100 dark:bg-slate-700 rounded-lg text-sm">
+        <Search className="w-4 h-4 text-slate-500 dark:text-slate-400 flex-shrink-0" />
         <input
           type="text"
           value={searchTerm}
@@ -84,8 +84,8 @@ export function GlobalSearch({
             setShowResults(true);
           }}
           onFocus={() => setShowResults(true)}
-          placeholder="Pesquisar remessa ou código..."
-          className="flex-1 bg-transparent outline-none text-slate-800 dark:text-white placeholder-slate-500 dark:placeholder-slate-400"
+          placeholder="Pesquisar..."
+          className="flex-1 bg-transparent outline-none text-slate-800 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 text-sm"
         />
         {searchTerm && (
           <button
@@ -101,7 +101,7 @@ export function GlobalSearch({
       </div>
 
       {showResults && searchTerm && results.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[#263d42] border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
           {results.map((result, index) => (
             <button
               key={`${result.type}-${result.barcodeId || result.remessaId}-${index}`}
@@ -129,7 +129,7 @@ export function GlobalSearch({
       )}
 
       {showResults && searchTerm && results.length === 0 && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 p-4 text-center text-slate-500 dark:text-slate-400">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[#263d42] border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 p-4 text-center text-slate-500 dark:text-slate-400">
           Nenhum resultado encontrado
         </div>
       )}
