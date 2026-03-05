@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Edit2, Trash2, Check, X } from 'lucide-react';
+import { Search, CreditCard as Edit2, Trash2, Check, X } from 'lucide-react';
 import type { Database } from '../lib/database.types';
 
 type BarcodeItem = Database['public']['Tables']['barcode_items']['Row'];
