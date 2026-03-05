@@ -51,10 +51,10 @@ export function ExportShareButtons({ items, listName, onDeleteAll }: ExportShare
             onClick={() => {
               printBarcodes(items, listName);
             }}
-            className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg transition flex items-center gap-2 font-medium"
+            className="bg-[#19282A] hover:opacity-80 text-[#C7FF41] p-2 rounded-lg transition flex items-center gap-2 font-medium"
+            title="Imprimir"
           >
             <Printer className="w-5 h-5" />
-            Imprimir
           </button>
         </div>
 
@@ -62,12 +62,11 @@ export function ExportShareButtons({ items, listName, onDeleteAll }: ExportShare
           <button
             onClick={() => {
               setShowExportMenu(!showExportMenu);
-              setShowShareMenu(false);
             }}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition flex items-center gap-2 font-medium"
+            className="bg-[#19282A] hover:opacity-80 text-[#C7FF41] p-2 rounded-lg transition flex items-center gap-2 font-medium"
+            title="Exportar"
           >
             <Download className="w-5 h-5" />
-            Exportar
           </button>
 
           {showExportMenu && (
@@ -108,18 +107,18 @@ export function ExportShareButtons({ items, listName, onDeleteAll }: ExportShare
 
         <button
           onClick={handleNativeShare}
-          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition flex items-center gap-2 font-medium"
+          className="bg-[#19282A] hover:opacity-80 text-[#C7FF41] p-2 rounded-lg transition flex items-center gap-2 font-medium"
+          title="Compartilhar"
         >
           <Share2 className="w-5 h-5" />
-          Compartilhar
         </button>
 
         <button
           onClick={handleDeleteAll}
-          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition flex items-center gap-2 font-medium"
+          className="bg-[#19282A] hover:opacity-80 text-[#C7FF41] p-2 rounded-lg transition flex items-center gap-2 font-medium"
+          title="Apagar Tudo"
         >
           <Trash2 className="w-5 h-5" />
-          Apagar Tudo
         </button>
       </div>
     </div>
