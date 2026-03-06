@@ -37,10 +37,10 @@ export function Auth() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-6 w-full max-w-md">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-5 w-full max-w-sm">
         {!isResetPassword && (
-          <div className="flex items-center justify-center mb-4">
-            <img src="/scan_4237488.png" alt="Scanner" className="w-12 h-12" />
+          <div className="flex items-center justify-center mb-3">
+            <img src="/scan_4237488.png" alt="Scanner" className="w-10 h-10" />
           </div>
         )}
 
@@ -51,31 +51,31 @@ export function Auth() {
               setResetSuccess(false);
               setError('');
             }}
-            className="flex items-center gap-2 text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 font-medium transition mb-4 text-sm"
+            className="flex items-center gap-2 text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 font-medium transition mb-3 text-xs"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-3 h-3" />
             Voltar
           </button>
         )}
 
         {resetSuccess && (
-          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3 mb-4 text-sm">
+          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-2 mb-3 text-xs">
             <p className="text-green-700 dark:text-green-400 font-medium">
-              Link de recuperação enviado! Verifique seu email.
+              Link enviado! Verifique seu email.
             </p>
           </div>
         )}
 
-        <h1 className="text-2xl font-bold text-center mb-1 text-slate-800 dark:text-white">
+        <h1 className="text-xl font-bold text-center mb-1 text-slate-800 dark:text-white">
           {isResetPassword ? 'Recuperar Senha' : isSignUp ? 'Criar Conta' : 'Entrar'}
         </h1>
-        <p className="text-center text-slate-600 dark:text-slate-400 mb-6 text-sm">
-          Gerenciador de Códigos de Barras
+        <p className="text-center text-slate-600 dark:text-slate-400 mb-4 text-xs">
+          Gerenciador de Códigos
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <form onSubmit={handleSubmit} className="space-y-2">
           <div>
-            <label htmlFor="email" className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+            <label htmlFor="email" className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-0.5">
               Email
             </label>
             <input
@@ -84,14 +84,14 @@ export function Auth() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition text-sm"
+              className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded text-xs focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
               placeholder="seu@email.com"
             />
           </div>
 
           {!isResetPassword && (
             <div>
-              <label htmlFor="password" className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+              <label htmlFor="password" className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-0.5">
                 Senha
               </label>
               <input
@@ -101,14 +101,14 @@ export function Auth() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
-                className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition text-sm"
+                className="w-full px-2.5 py-1.5 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded text-xs focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
                 placeholder="••••••••"
               />
             </div>
           )}
 
           {error && (
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-3 py-2 rounded-lg text-xs">
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-2.5 py-1.5 rounded text-xs">
               {error}
             </div>
           )}
@@ -116,7 +116,7 @@ export function Auth() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-amber-500 hover:bg-amber-600 disabled:bg-amber-300 text-white font-semibold py-2 px-4 rounded-lg transition flex items-center justify-center gap-2 text-sm"
+            className="w-full bg-amber-500 hover:bg-amber-600 disabled:bg-amber-300 text-white font-semibold py-1.5 px-3 rounded transition flex items-center justify-center gap-2 text-xs"
           >
             {loading ? (
               'Processando...'
@@ -133,7 +133,7 @@ export function Auth() {
 
         {!isResetPassword && (
           <>
-            <div className="relative my-4">
+            <div className="relative my-2.5">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-slate-300 dark:border-slate-600"></div>
               </div>
@@ -151,9 +151,9 @@ export function Auth() {
                 });
               }}
               disabled={loading}
-              className="w-full bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600 disabled:opacity-50 text-slate-700 dark:text-white font-semibold py-2 px-4 rounded-lg transition flex items-center justify-center gap-2 text-sm"
+              className="w-full bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600 disabled:opacity-50 text-slate-700 dark:text-white font-semibold py-1.5 px-3 rounded transition flex items-center justify-center gap-2 text-xs"
             >
-              <svg className="w-5 h-5" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" viewBox="0 0 24 24">
                 <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                 <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                 <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
@@ -165,7 +165,7 @@ export function Auth() {
         )}
 
 
-        <div className="mt-4 space-y-2 text-center">
+        <div className="mt-3 space-y-1.5 text-center">
           {!isResetPassword && (
             <button
               onClick={() => setIsResetPassword(true)}
@@ -179,7 +179,7 @@ export function Auth() {
               onClick={() => setIsSignUp(!isSignUp)}
               className="block w-full text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 font-medium transition text-xs"
             >
-              {isSignUp ? 'Já tem uma conta? Entre' : 'Não tem conta? Cadastre-se'}
+              {isSignUp ? 'Já tem conta?' : 'Sem conta?'} {isSignUp ? 'Entre' : 'Cadastre-se'}
             </button>
           )}
         </div>
